@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nusantara Bersuara — Lagu Daerah Indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --black: #0a0a0a;
+        --white: #f5f0e8;
+        --yellow: #ffd000;
+        --red: #e63329;
+        --blue: #1a3fbf;
+        --green: #1db85c;
+        --border: 3px solid #0a0a0a;
+        --shadow: 5px 5px 0px #0a0a0a;
+        --shadow-lg: 8px 8px 0px #0a0a0a;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background-color: var(--white);
+        color: var(--black);
+        overflow-x: hidden;
+      }
+
+      .serif {
+        font-family: "Instrument Serif", serif;
+      }
+
+      /* NOISE TEXTURE */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.4;
+      }
+
+      /* NAV */
+      nav {
+        border-bottom: var(--border);
+        background: var(--yellow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      /* NEO-BRUTALIST ELEMENTS */
+      .neo-box {
+        border: var(--border);
+        box-shadow: var(--shadow);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .neo-box:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .neo-btn {
+        border: var(--border);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        font-weight: 700;
+        font-family: "Space Grotesk", sans-serif;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .neo-btn:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: var(--shadow-lg);
+      }
+      .neo-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px #0a0a0a;
+      }
+
+      /* HERO MARQUEE */
+      .marquee-wrapper {
+        overflow: hidden;
+        border-top: var(--border);
+        border-bottom: var(--border);
+        background: var(--red);
+      }
+      .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: marquee 20s linear infinite;
+      }
+      .marquee-track span {
+        white-space: nowrap;
+        padding: 0 2rem;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--white);
+        letter-spacing: 0.05em;
+      }
+      @keyframes marquee {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* CARDS */
+      .song-card {
+        border: var(--border);
+        box-shadow: var(--shadow);
+        background: var(--white);
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .song-card:hover {
+        transform: translate(-4px, -4px);
+        box-shadow: 8px 8px 0 var(--black);
+      }
+
+      .card-img-wrap {
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        border-bottom: var(--border);
+        position: relative;
+      }
+      .card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      .song-card:hover .card-img-wrap img {
+        transform: scale(1.05);
+      }
+      .region-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 3px 10px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border: 2px solid var(--black);
+        box-shadow: 3px 3px 0 var(--black);
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 10, 10, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-box {
+        background: var(--white);
+        border: var(--border);
+        box-shadow: 10px 10px 0 var(--black);
+        max-width: 680px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: translate(8px, 8px);
+        transition: transform 0.2s ease;
+      }
+      .modal-overlay.open .modal-box {
+        transform: translate(0, 0);
+      }
+
+      /* FILTER TABS */
+      .filter-tab {
+        border: var(--border);
+        padding: 8px 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--white);
+        box-shadow: 3px 3px 0 var(--black);
+        transition: all 0.12s;
+      }
+      .filter-tab:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0 var(--black);
+      }
+      .filter-tab.active {
+        background: var(--black);
+        color: var(--yellow);
+      }
+
+      /* SCROLL REVEAL */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* SEARCH */
+      .search-input {
+        border: var(--border);
+        box-shadow: var(--shadow);
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        background: var(--white);
+        outline: none;
+        transition: box-shadow 0.15s;
+      }
+      .search-input:focus {
+        box-shadow: 7px 7px 0 var(--black);
+      }
+
+      /* STATS BAR */
+      .stat-item {
+        border-right: var(--border);
+      }
+      .stat-item:last-child {
+        border-right: none;
+      }
+
+      /* LYRIC BLOCK */
+      .lyric-stanza {
+        border-left: 4px solid var(--black);
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* SECTION LABEL */
+      .section-eyebrow {
+        display: inline-block;
+        background: var(--black);
+        color: var(--yellow);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 4px 12px;
+        margin-bottom: 1rem;
+      }
+
+      /* ISLAND PATTERN HERO BG */
+      .hero-pattern {
+        background-image: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 20px,
+          rgba(10, 10, 10, 0.04) 20px,
+          rgba(10, 10, 10, 0.04) 40px
+        );
+      }
+
+      /* FOOTER */
+      footer {
+        border-top: var(--border);
+        background: var(--black);
+        color: var(--white);
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--white);
+        border-left: 2px solid var(--black);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--black);
+      }
+
+      /* MOBILE ADJUSTMENTS */
+      @media (max-width: 640px) {
+        .hero-title {
+          font-size: clamp(2.8rem, 12vw, 5rem);
+        }
+        .modal-box {
+          max-height: 95vh;
+        }
+      }
+
+      /* GRID MASONRY-LIKE */
+      .songs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+
+      /* STICKER BADGE */
+      .sticker {
+        display: inline-block;
+        background: var(--yellow);
+        border: 2px solid var(--black);
+        box-shadow: 3px 3px 0 var(--black);
+        font-weight: 800;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 3px 10px;
+      }
+
+      /* CLOSE BTN */
+      .close-btn {
+        width: 40px;
+        height: 40px;
+        border: var(--border);
+        background: var(--red);
+        color: white;
+        font-weight: 900;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 3px 3px 0 var(--black);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+      }
+      .close-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0 var(--black);
+      }
+
+      .no-results {
+        display: none;
+      }
+
+      #back-to-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      #back-to-top.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+    <nav>
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16"
+      >
+        <a href="#" class="flex items-center gap-2">
+          <div
+            class="w-9 h-9 bg-black flex items-center justify-center border-2 border-black"
+            style="box-shadow: 3px 3px 0 #0a0a0a"
+          >
+            <span
+              class="text-yellow-300 font-black text-lg"
+              style="color: var(--yellow)"
+              >♩</span
+            >
+          </div>
+          <span class="font-black text-lg tracking-tight hidden sm:block"
+            >NUSANTARA BERSUARA</span
+          >
+          <span class="font-black text-base tracking-tight sm:hidden"
+            >NUSANTARA</span
+          >
+        </a>
+        <div class="flex items-center gap-3">
+          <span class="sticker hidden sm:inline-block">🇮🇩 38 Provinsi</span>
+          <button
+            class="neo-btn px-4 py-2 text-sm bg-black text-white"
+            onclick="scrollToSection('koleksi')"
+          >
+            Jelajahi ↓
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+    <section
+      class="hero-pattern"
+      style="background-color: #ffd000; border-bottom: 3px solid #0a0a0a"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div class="section-eyebrow">Warisan Budaya Bangsa</div>
+            <h1
+              class="hero-title serif font-bold leading-none mb-6"
+              style="font-size: clamp(3.5rem, 9vw, 6.5rem); font-style: italic"
+            >
+              Suara<br />Nusantara
+            </h1>
+            <p
+              class="text-xl font-medium max-w-md mb-8 leading-relaxed"
+              style="color: #1a1a1a"
+            >
+              Jelajahi kekayaan melodi dari sabang sampai merauke — setiap lagu
+              menyimpan jiwa, cerita, dan identitas daerahnya.
+            </p>
+            <div class="flex flex-wrap gap-3">
+              <button
+                class="neo-btn px-6 py-3 text-base bg-black text-white"
+                onclick="scrollToSection('koleksi')"
+              >
+                Lihat Koleksi Lagu →
+              </button>
+              <button
+                class="neo-btn px-6 py-3 text-base bg-white"
+                onclick="scrollToSection('tentang')"
+              >
+                Tentang Proyek
+              </button>
+            </div>
+          </div>
+          <!-- HERO VISUAL -->
+          <div class="hidden lg:flex justify-end">
+            <div class="relative">
+              <div
+                class="neo-box w-72 h-72 bg-red-600 flex items-center justify-center"
+                style="background: var(--red); rotate: -6deg"
+              >
+                <div class="text-9xl select-none">🎵</div>
+              </div>
+              <div
+                class="absolute -bottom-6 -left-8 neo-box w-40 h-40 flex items-center justify-center"
+                style="background: var(--blue); rotate: 5deg"
+              >
+                <div class="text-6xl select-none">🥁</div>
+              </div>
+              <div
+                class="absolute -top-4 -right-4 neo-box px-4 py-2 font-black text-sm"
+                style="background: var(--green); rotate: 3deg"
+              >
+                🗺️ 25+ LAGU DAERAH
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ MARQUEE ═══════════════════════════════ -->
+    <div class="marquee-wrapper py-3">
+      <div class="marquee-track">
+        <span>🎶 Gundul Pacul — Jawa Tengah</span>
+        <span>★</span>
+        <span>🎶 Ampar-Ampar Pisang — Kalimantan Selatan</span>
+        <span>★</span>
+        <span>🎶 Bungong Jeumpa — Aceh</span>
+        <span>★</span>
+        <span>🎶 Apuse — Papua</span>
+        <span>★</span>
+        <span>🎶 Rasa Sayange — Maluku</span>
+        <span>★</span>
+        <span>🎶 Lir-Ilir — Jawa Tengah</span>
+        <span>★</span>
+        <span>🎶 O Ina Ni Keke — Sulawesi Utara</span>
+        <span>★</span>
+        <span>🎶 Manuk Dadali — Jawa Barat</span>
+        <span>★</span>
+        <!-- DUPLICATE -->
+        <span>🎶 Gundul Pacul — Jawa Tengah</span>
+        <span>★</span>
+        <span>🎶 Ampar-Ampar Pisang — Kalimantan Selatan</span>
+        <span>★</span>
+        <span>🎶 Bungong Jeumpa — Aceh</span>
+        <span>★</span>
+        <span>🎶 Apuse — Papua</span>
+        <span>★</span>
+        <span>🎶 Rasa Sayange — Maluku</span>
+        <span>★</span>
+        <span>🎶 Lir-Ilir — Jawa Tengah</span>
+        <span>★</span>
+        <span>🎶 O Ina Ni Keke — Sulawesi Utara</span>
+        <span>★</span>
+        <span>🎶 Manuk Dadali — Jawa Barat</span>
+        <span>★</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ STATS ═══════════════════════════════ -->
+    <section
+      style="border-bottom: var(--border); background: #0a0a0a; color: #f5f0e8"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-2 sm:grid-cols-4">
+          <div class="stat-item p-6 sm:p-8 text-center">
+            <div class="text-4xl font-black" style="color: var(--yellow)">
+              25+
+            </div>
+            <div class="text-sm font-medium mt-1 opacity-70">Lagu Daerah</div>
+          </div>
+          <div class="stat-item p-6 sm:p-8 text-center">
+            <div class="text-4xl font-black" style="color: var(--red)">17</div>
+            <div class="text-sm font-medium mt-1 opacity-70">Provinsi</div>
+          </div>
+          <div class="stat-item p-6 sm:p-8 text-center">
+            <div class="text-4xl font-black" style="color: var(--green)">5</div>
+            <div class="text-sm font-medium mt-1 opacity-70">Pulau Besar</div>
+          </div>
+          <div class="p-6 sm:p-8 text-center">
+            <div class="text-4xl font-black" style="color: var(--blue)">∞</div>
+            <div class="text-sm font-medium mt-1 opacity-70">
+              Kekayaan Budaya
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ KOLEKSI ═══════════════════════════════ -->
+    <section id="koleksi" class="py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div
+        class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10"
+      >
+        <div>
+          <div class="section-eyebrow">Koleksi Lengkap</div>
+          <h2 class="text-4xl sm:text-5xl font-black leading-tight">
+            Lagu Daerah<br /><span class="serif italic font-bold"
+              >Indonesia</span
+            >
+          </h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍  Cari lagu atau daerah..."
+            class="search-input px-4 py-3 w-64"
+            oninput="filterSongs()"
+          />
+        </div>
+      </div>
+
+      <!-- FILTER TABS -->
+      <div class="flex flex-wrap gap-2 mb-10" id="filterTabs">
+        <button
+          class="filter-tab active"
+          data-filter="semua"
+          onclick="setFilter(this, 'semua')"
+        >
+          Semua
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="jawa"
+          onclick="setFilter(this, 'jawa')"
+        >
+          Jawa
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="sumatra"
+          onclick="setFilter(this, 'sumatra')"
+        >
+          Sumatra
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="kalimantan"
+          onclick="setFilter(this, 'kalimantan')"
+        >
+          Kalimantan
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="sulawesi"
+          onclick="setFilter(this, 'sulawesi')"
+        >
+          Sulawesi
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="papua"
+          onclick="setFilter(this, 'papua')"
+        >
+          Papua
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="bali-ntt"
+          onclick="setFilter(this, 'bali-ntt')"
+        >
+          Bali & NTT
+        </button>
+        <button
+          class="filter-tab"
+          data-filter="maluku"
+          onclick="setFilter(this, 'maluku')"
+        >
+          Maluku
+        </button>
+      </div>
+
+      <!-- CARDS GRID -->
+      <div class="songs-grid" id="songsGrid"></div>
+      <div class="no-results text-center py-20" id="noResults">
+        <div class="text-6xl mb-4">🎵</div>
+        <p class="text-2xl font-black">Lagu tidak ditemukan</p>
+        <p class="text-gray-500 mt-2">Coba kata kunci lain</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ TENTANG ═══════════════════════════════ -->
+    <section
+      id="tentang"
+      style="
+        background: var(--blue);
+        border-top: var(--border);
+        border-bottom: var(--border);
+      "
+      class="py-16 sm:py-24 px-4 sm:px-6"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div
+              class="section-eyebrow"
+              style="background: var(--yellow); color: var(--black)"
+            >
+              Tentang Proyek
+            </div>
+            <h2
+              class="text-4xl sm:text-5xl font-black text-white leading-tight mb-6"
+            >
+              Melestarikan<br /><span
+                class="serif italic"
+                style="color: var(--yellow)"
+                >Warisan Leluhur</span
+              >
+            </h2>
+            <p class="text-white opacity-90 text-lg leading-relaxed mb-8">
+              Nusantara Bersuara hadir sebagai ruang digital untuk mengenal,
+              menghargai, dan melestarikan lagu-lagu daerah Indonesia yang
+              merupakan bagian tak terpisahkan dari identitas bangsa. Dari hutan
+              Kalimantan hingga pesisir Maluku, setiap melodi menceritakan
+              kehidupan, harapan, dan kearifan lokal.
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <div class="neo-box p-4 bg-white text-black">
+                <div class="font-black text-2xl" style="color: var(--red)">
+                  🎼
+                </div>
+                <div class="font-bold mt-1">Lirik Lengkap</div>
+                <div class="text-sm opacity-70">Setiap lagu</div>
+              </div>
+              <div class="neo-box p-4 bg-white text-black">
+                <div class="font-black text-2xl" style="color: var(--green)">
+                  🗺️
+                </div>
+                <div class="font-bold mt-1">Asal Daerah</div>
+                <div class="text-sm opacity-70">Peta budaya</div>
+              </div>
+              <div class="neo-box p-4 bg-white text-black">
+                <div class="font-black text-2xl" style="color: var(--blue)">
+                  👤
+                </div>
+                <div class="font-bold mt-1">Pencipta Lagu</div>
+                <div class="text-sm opacity-70">Informasi lengkap</div>
+              </div>
+            </div>
+          </div>
+          <div class="relative hidden lg:block">
+            <div class="neo-box p-8 bg-white rotate-2">
+              <p class="text-2xl serif italic font-bold leading-relaxed">
+                "Musik daerah adalah jembatan antara generasi masa lalu dan masa
+                depan. Ia bukan sekadar nada, tetapi jiwa dari sebuah
+                peradaban."
+              </p>
+              <div class="mt-4 flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold"
+                >
+                  N
+                </div>
+                <span class="font-bold">Nusantara Bersuara</span>
+              </div>
+            </div>
+            <div
+              class="neo-box p-4 bg-yellow-400 font-black text-sm absolute -bottom-4 -right-4"
+              style="background: var(--yellow); rotate: -3deg"
+            >
+              🎵 25+ LAGU & TERUS BERTAMBAH
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ CTA FOOTER ═══════════════════════════════ -->
+    <section
+      style="background: var(--yellow); border-bottom: var(--border)"
+      class="py-12 sm:py-16 px-4 sm:px-6 text-center"
+    >
+      <div class="max-w-3xl mx-auto">
+        <div class="text-6xl mb-4">♩</div>
+        <h2 class="text-3xl sm:text-4xl font-black mb-4">
+          Bangga dengan Budaya Sendiri
+        </h2>
+        <p class="text-lg mb-8 opacity-80">
+          Kenalkan lagu daerah Indonesia kepada generasi muda. Bagikan halaman
+          ini kepada teman dan keluarga.
+        </p>
+        <button
+          class="neo-btn px-8 py-4 text-lg bg-black text-white"
+          onclick="scrollToSection('koleksi')"
+        >
+          Mulai Jelajahi Sekarang ↑
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+    <footer class="py-10 px-4 sm:px-6">
+      <div
+        class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 flex items-center justify-center border-2 border-yellow-400 text-yellow-400 font-black"
+          >
+            ♩
+          </div>
+          <span class="font-black text-white">NUSANTARA BERSUARA</span>
+        </div>
+        <p class="text-sm opacity-50 text-center" style="color: #f5f0e8">
+          Dibuat untuk mengenalkan dan melestarikan budaya Indonesia. © 2026
+        </p>
+        <p
+          class="text-sm opacity-50 text-center sm:text-right"
+          style="color: #f5f0e8"
+        >
+          Warisan Leluhur, Untuk Generasi Mendatang
+        </p>
+      </div>
+    </footer>
+
+    <!-- ═══════════════════════════════ BACK TO TOP ═══════════════════════════════ -->
+    <button
+      id="back-to-top"
+      class="neo-btn px-4 py-3 font-black text-sm"
+      style="background: var(--yellow); color: var(--black)"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    >
+      ↑ ATAS
+    </button>
+
+    <!-- ═══════════════════════════════ MODAL ═══════════════════════════════ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+      <div class="modal-box" id="modalBox">
+        <!-- Dynamic content injected by JS -->
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+    <script src="script.js"></script>
+  </body>
+</html>
